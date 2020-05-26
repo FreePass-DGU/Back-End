@@ -26,9 +26,8 @@
 
 
     //전체 코스 목록 출력
-    if (!empty($_GET['id'])) { 
-        echo "where r u?";
-        
+    if (!isset($_GET['id'])) { 
+
         $sql = "select * from course";
         $result = mysqli_query($con, $sql);
     
@@ -47,10 +46,9 @@
             echo '{}';
         }
 
-
-    } elseif (empty($_GET['id'])) {
-        //유저가 고른 조건에 따른 코스 목록 출력
-        if($_GET['id'] == 0){
+     //유저가 고른 조건에 따른 코스 목록 출력
+    } elseif (isset($_GET['id']) and $_GET['id'] == 0) {
+    
             
             //가장 최근 유저의 필터링 조건 기록
             $sql = "select hashtags from history where h_id = (
@@ -83,14 +81,11 @@
                 echo '{}';
             }
 
-        //특정 코스에 대한 정보 출력    
-        }else{
-            
-            
-        }
+    // 특정 코스에 대한 정보 출력
+    } elseif (isset($_GET['id']) and $_GET['id'] != 0){
+    
 
     } else {
-        
         echo '{"status": 400, "messages": "wrong access"}';
         exit();
     }   
