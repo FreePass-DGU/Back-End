@@ -1,4 +1,4 @@
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Type" content="application/json; charset=utf-8" />
 <?php 
 
     //로그인 이후 저장되는 세션 형식에 따라 변경할 부분
@@ -24,12 +24,14 @@
     }
     //echo "mysql connect!";
     
+    $_POST = json_decode(file_get_contents('php://input'), true);
     if(!$_POST['purposes']) {
         echo '{"status": 401, "messages": "no post data"}';
     }
 
-    $sql = "INSERT INTO history (u_id, hashtags) VALUES(".$user_id.", ".$_POST['purposes'].")";
+    $sql = "INSERT INTO history (u_id, hashtags) VALUES(".$user_id.", \"".$_POST['purposes']."\")";
     //echo $sql;
+
 
     if(!mysqli_query($con,$sql)){
         die('Error: '.mysqli_error($con));
@@ -42,7 +44,9 @@
         
         // encode php array to json string
         $RESULT = json_encode($arr, JSON_UNESCAPED_UNICODE);
+        //echo gettype($RESULT);
         echo $RESULT;
+
     
         if (json_last_error() > 0) {
             echo json_last_error_msg() . PHP_EOL;
