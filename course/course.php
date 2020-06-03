@@ -1,6 +1,6 @@
-<meta http-equiv="Content-Type" "application/json; charset=utf-8" />
-<?php 
 
+<?php 
+    header('Content-type="application/json; charset=utf-8"');
     //로그인 이후 저장되는 세션 형식에 따라 변경할 부분
     session_start();
     $headers = apache_request_headers();
@@ -50,7 +50,7 @@
     
             //가장 최근 유저의 필터링 조건 기록
             $sql = "select hashtags from history where h_id = (
-                select max(h_id) from history where u_id = ".$user_id.")";
+                select max(h_id) from history where u_id = \"".$user_id."\")";
             $hashtags = mysqli_query($con, $sql);
             $hashtags = mysqli_fetch_array($hashtags)["hashtags"];
             $hashtags = explode(';', $hashtags);
@@ -221,11 +221,25 @@
         'message' => '코스 출력 완료'
     );
     $arr['data'] = $Return_FinalArray;  
-    
+
+    header('Content-type: application/json');
     // encode php array to json string
-    $RESULT = json_encode($arr, JSON_UNESCAPED_UNICODE);     
-    echo $RESULT;
+    $RESULT = json_encode($arr, JSON_UNESCAPED_UNICODE);   
+    //echo $RESULT;
     
+    if ($RESULT === false) {
+        // Avoid echo of empty string (which is invalid JSON), and
+        // JSONify the error message instead:
+            $RESULT = json_encode(array("jsonError", json_last_error_msg()));
+            if ($RESULT === false) {
+            // This should not happen, but we go all the way now:
+            $RESULT = '{"jsonError": "unknown"}';
+        }
+        // Set HTTP response status code to: 500 - Internal Server Error
+        http_response_code(500);
+    }
+    echo $RESULT;
+
     if (json_last_error() > 0) {
         echo json_last_error_msg() . PHP_EOL;
     }
